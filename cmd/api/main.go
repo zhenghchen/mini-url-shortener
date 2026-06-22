@@ -28,9 +28,6 @@ func main() {
 	ctx := context.Background()
 	
 	endpoint := os.Getenv("DYNAMO_ENDPOINT")
-	if endpoint == "" {
-		endpoint = "http://localhost:8000"
-	}
 	store, err := database.NewStore(ctx, endpoint)
 
 	if err != nil {

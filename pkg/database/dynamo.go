@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/aws"
     "github.com/aws/aws-sdk-go-v2/config"
-    "github.com/aws/aws-sdk-go-v2/credentials"
     "github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
     "github.com/aws/aws-sdk-go-v2/service/dynamodb"
     "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
@@ -19,17 +18,19 @@ type Store struct {
 func NewStore(ctx context.Context, endpoint string) (*Store, error) {
 
 	cfg, err := config.LoadDefaultConfig(ctx,
-		config.WithRegion("us-east-1"),
-    	config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("fake", "fake", "")),
+		config.WithRegion("us-west-2"),
     )
     if err != nil {
         return nil, err
     }
 
-	client := dynamodb.NewFromConfig(cfg, func(o *dynamodb.Options) {
-		o.BaseEndpoint = aws.String(endpoint)
-
-	})
+	var opts []func(*dynamodb.Options)
+	if endpoint != "" {
+		opts = append(opts, func(o *dynamodb.Options) {
+			o.BaseEndpoint = aws.String(endpoint)
+		})
+	}
+	client := dynamodb.NewFromConfig(cfg, opts...)
 
 	return &Store{client: client}, nil
 
