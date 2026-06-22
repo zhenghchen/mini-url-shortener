@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"os"
 
 	"github.com/zhenghchen/mini-url-shortener/pkg/database"
 )
@@ -25,8 +26,12 @@ func generateCode() string {
 
 func main() {
 	ctx := context.Background()
-
-	store, err := database.NewStore(ctx, "http://localhost:8000")
+	
+	endpoint := os.Getenv("DYNAMO_ENDPOINT")
+	if endpoint == "" {
+		endpoint = "http://localhost:8000"
+	}
+	store, err := database.NewStore(ctx, endpoint)
 
 	if err != nil {
 		panic(err)
